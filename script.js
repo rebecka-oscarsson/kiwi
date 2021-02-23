@@ -1,26 +1,4 @@
-function skrivTid() {
-    const idag = new Date();
-    const datumElement = document.getElementById("date");
-    const dagensDatum = idag.getDate();
-    const manader = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
-    const nuvarandeManad = manader[new Date().getMonth()]
-    const timmar = idag.getHours();
-    const minuter = idag.getMinutes();
-    const sekunder = idag.getSeconds();
-    datumElement.textContent = `${dagensDatum} ${nuvarandeManad} klockan ${timmar} : ${minuter} : ${sekunder}`;
-}
-
-// setInterval(skrivTid, 1000);
-
-
-
-
-let redbird = document.querySelector(".redbird");
-redbird.addEventListener("mouseover", () => redbird.classList.add("jump"));
-
 let bluebird = document.querySelector(".bluebird");
-
-
 
 
 function jump(element) {
@@ -70,14 +48,12 @@ document.addEventListener("keydown", function (evt) {
             }
             break;
         case "j":
-            var sound = document.getElementById("myAudio");
-            sound.play();
             jump(bluebird);
             break;
     }
 });
 
-const gameContainer = document.getElementsByClassName("kiwiContainer")[1];
+const gameContainer = document.getElementById("gameContainer");
 
 
 
@@ -143,16 +119,19 @@ function createFood2() {
 
 function collision() {
     let detection = setInterval(() => {
+            let birdWidth = parseInt(window.getComputedStyle(bluebird).getPropertyValue("width"));
+            let birdHeight = parseInt(window.getComputedStyle(bluebird).getPropertyValue("height"));
             let oldFood = document.querySelectorAll("span");
-            if (oldFood[0]) { //det blir fel om funktionen körs innan det finns någon mat
+            if (oldFood.length>0) { //det blir fel om funktionen körs innan det finns någon mat
                 for (let index = 0; index < oldFood.length; index++) {
                     let foodPositionLeft = parseInt(window.getComputedStyle(oldFood[index]).getPropertyValue("left"));
                     let foodPositionBottom = parseInt(window.getComputedStyle(oldFood[index]).getPropertyValue("bottom"));
                     let birdPositionLeft = parseInt(window.getComputedStyle(bluebird).getPropertyValue("left"));
                     let birdPositionBottom = parseInt(window.getComputedStyle(bluebird).getPropertyValue("bottom"));
                     console.log("mat: ", foodPositionLeft, foodPositionBottom, "fågel: ", birdPositionLeft, birdPositionBottom)
-                    if (foodPositionLeft > birdPositionLeft - 50 && foodPositionLeft < birdPositionLeft +50 && foodPositionBottom > birdPositionBottom - 10 && foodPositionBottom < birdPositionBottom +10)
-                    {alert("nu!")
+                    if (foodPositionLeft +birdWidth > birdPositionLeft - 50 && foodPositionLeft +birdWidth < birdPositionLeft +50  && foodPositionBottom > birdPositionBottom - 10 && foodPositionBottom < birdPositionBottom +10)
+                    {var sound = document.getElementById("myAudio");
+                    sound.play();
                     gameContainer.removeChild(oldFood[index])};
                     //  && foodPositionBottom == birdPositionBottom 
                 }

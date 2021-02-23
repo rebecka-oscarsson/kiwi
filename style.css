@@ -1,52 +1,47 @@
 * {
-    padding: 0;
-    margin: 0;
-    /* outline: 1px solid black;
-    box-sizing: border-box; */
+    /* outline: 1px solid black; */
+    box-sizing: border-box;
 }
 
 body {
+    padding: 0;
+    margin: 0;
     font-family: 'Courier New', Courier, monospace;
     background-color: peachpuff;
-}
-
-.gridContainer {
     min-height: 100vh;
+    height:100vh;
     width: 100vw;
     overflow: hidden;
-    display: grid;
-    grid-template-rows: 1fr 1fr 2fr;
-    grid-template-columns: 1fr;
-    align-items:stretch;
+    display:grid;
+    grid-template-rows: 1fr 1fr;
 }
+
 
 i{font-size: 80px;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black;
     position:relative;}
 
-span {position:relative; font-size:xx-large}
+span {position:relative; font-size: 80px;}
 
-.redbird {
-    color: firebrick;  
-}
+
 
 .bluebird {
     color: teal;
-    position:absolute;
+    position:relative;
 }
 
 .mirror {transform: scaleX(-1);}
 
-.jump {
+/* .jump {
     animation: jump 0.2s alternate infinite ease-in-out, moveRight 10s 1 linear forwards;
-}
+} */
 
-.kiwiContainer {
+/* .gameContainer {
     display: flex;
+    justify-content: flex-end;
     align-items: flex-end;
-    max-width:100vw;
-}
+} */
 
 .jump2 {animation: jump 0.2s alternate infinite ease-in-out}
 
@@ -63,25 +58,10 @@ span {position:relative; font-size:xx-large}
     }
 }
 
-.moveLeft {animation: moveLeft 10s 1 linear;}
+/* .moveLeft {animation: moveLeft 10s 1 linear;} */
 
 @keyframes moveLeft {
     to {
         transform: translatex(-100vw);
     }
 }
-
-.sun {
-    font-size: 100px;
-    color: black;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-}
-
-.sun:hover {color:red; transition:color 3s ease-in-out}
-
-@keyframes glow {
-    from {
-        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #e60073, 0 0 20px #e60073, 0 0 25px #e60073, 0 0 30px #e60073, 0 0 60px #e60073;
-    }}
