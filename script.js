@@ -129,7 +129,7 @@ function collision() {
                     let birdPositionLeft = parseInt(window.getComputedStyle(bluebird).getPropertyValue("left"));
                     let birdPositionBottom = parseInt(window.getComputedStyle(bluebird).getPropertyValue("bottom"));
                     console.log("mat: ", foodPositionLeft, foodPositionBottom, "fågel: ", birdPositionLeft, birdPositionBottom)
-                    if (foodPositionLeft +birdWidth > birdPositionLeft - 50 && foodPositionLeft +birdWidth < birdPositionLeft +50  && foodPositionBottom > birdPositionBottom - 10 && foodPositionBottom < birdPositionBottom +10)
+                    if (foodPositionLeft > birdPositionLeft - 100 && foodPositionLeft < birdPositionLeft +100  && foodPositionBottom > birdPositionBottom - 100 && foodPositionBottom < birdPositionBottom +100)
                     {var sound = document.getElementById("myAudio");
                     sound.play();
                     gameContainer.removeChild(oldFood[index])};
