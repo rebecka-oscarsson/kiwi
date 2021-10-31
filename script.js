@@ -10,11 +10,11 @@ function jump(element) {
         if (counter == 10) {
             clearInterval(timer)
             let timerDown = setInterval(() => {
-                if (bottom == 0) {
+                if (bottom == 10) {
                     clearInterval(timerDown)
                 } else {
-                    bottom -= 10;
-                    element.style.bottom = bottom + "%";
+                    bottom -= 5;
+                    element.style.bottom = bottom + "vh";
                 }
             }, 50);
         }
@@ -149,11 +149,13 @@ function collision() {
 
 
 
-
+const stopButton = document.querySelector("#stopButton");
+stopButton.addEventListener("click", ()=>{alert("click"); clearInterval(
+    createFood2)})
 
 function makeFlyingFood() {
     setInterval(
-        createFood2, 2000)
+        createFood2, 5000)
 }
 
 makeFlyingFood()
