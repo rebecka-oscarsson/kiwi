@@ -150,7 +150,7 @@ function collision() {
 
 
 const stopButton = document.querySelector("#stopButton");
-stopButton.addEventListener("click", ()=>{alert("click"); clearInterval(
+stopButton.addEventListener("click", ()=>{alert("tryck ok för att starta igen"); clearInterval(
     createFood2)})
 
 function makeFlyingFood() {
