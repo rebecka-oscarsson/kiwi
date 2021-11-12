@@ -13,13 +13,31 @@
 </head>
 
 <body>
-    <div><button id="stopButton">pausa spelet</button></div>
+    <div class="gameInfo">
+        <div class="score">🥝: <span id="score"></span> <i class="fas fa-kiwi-bird"></i>: <span id="lives"></span></div>
+        <div class="instructions">Play using arrows and J on keyboard</div>
+        <div class="switches">
+            <label for="pauseButton">game: <span class="pause">play</span></label>
+            <label for="musicButton">sound: <span class="sound">on</span></label>  
+            <label class="switch">
+                <input type="checkbox" checked id="pauseButton">
+                <span class="slider"></span>
+            </label>
+            <label class="switch">
+                <input type="checkbox" checked id="musicButton">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
     <div id="gameContainer">
-        <i class="fas fa-kiwi-bird bluebird" style="left:0%"></i>
+        <!-- <img src="dino.png" class="bluebird" style="left:2%"> -->
+        <i class="fas fa-kiwi-bird bluebird" style="left:2%"></i>
         <img src="mossa.png" class="foreground">
+        <img src="rosmossa2.png" class="foreground2">
     </div>
     <audio id="myAudio">
-        <source src="ljud.wav" type="audio/wav">
+        <source src="dino.wav" type="audio/wav">
     </audio>
 </body>
 

@@ -1,38 +1,54 @@
-let bluebird = document.querySelector(".bluebird");
+//html-element
+const bluebird = document.querySelector(".bluebird");
+const gameContainer = document.getElementById("gameContainer");
+const switches = document.querySelector(".switches");
+const scoreDisplay = document.querySelector("#score");
+const livesDisplay = document.querySelector("#lives");
 
+//variabler
+let paused = false;
+let lives = 3;
+let score = 0;
 
-function jump(element) {
+//bugg: kiwin backar efter hopp om ansiktet åt vänster
+//bryt ut dino
+//räknare liv och kiwis
+
+scoreDisplay.textContent = score;
+livesDisplay.textContent = lives;
+
+function jump(element, jumptime) {
+    if(element.classList.contains("dino"))
+    {element.classList.add("dinoJump")};
     let counter = 0;
     let bottom = 0;
     let timer = setInterval(() => {
         counter++;
         bottom += 5;
-        if (counter == 10) {
+        if (counter == 15) {
             clearInterval(timer)
             let timerDown = setInterval(() => {
                 if (bottom == 10) {
-                    clearInterval(timerDown)
+                    clearInterval(timerDown);
+                    element.classList.remove("dinoJump");
                 } else {
                     bottom -= 5;
-                    element.style.bottom = bottom + "vh";
+                    element.style.bottom = bottom + "%";
                 }
-            }, 50);
+            }, jumptime);
         }
         element.style.bottom = bottom + "%";
-    }, 50);
+    }, jumptime);
 }
 
-// bluebird.style.left = "0%";
-//varför?
-
+//funktionen som flyttar fågeln
 document.addEventListener("keydown", function (evt) {
     let moveDistance = 1;
     let birdPosition = parseInt(bluebird.style.left);
 
-
     switch (evt.key) {
         case "ArrowLeft":
-            bluebird.classList.remove("jump2");
+            // bluebird.classList.remove("jump");
             if (birdPosition > 0) {
                 bluebird.classList.add("mirror");
                 bluebird.style.left = birdPosition - moveDistance + "%";
@@ -40,7 +56,7 @@ document.addEventListener("keydown", function (evt) {
             }
             break;
         case "ArrowRight":
-            bluebird.classList.add("jump2");
+            // bluebird.classList.add("jump");
             if (birdPosition < 96) {
                 bluebird.classList.remove("mirror");
                 bluebird.style.left = birdPosition + moveDistance + "%";
@@ -48,115 +64,219 @@ document.addEventListener("keydown", function (evt) {
             }
             break;
         case "j":
-            jump(bluebird);
+            jump(bluebird, 70);
             break;
     }
 });
 
-const gameContainer = document.getElementById("gameContainer");
-
-
-
-
-// function createFood() {
-//     let oldFood = document.querySelectorAll(".moveLeft");
-//     if(oldFood[0]) {alert (oldFood[0].style.left)}
-//     // if(oldFood) {oldFood.style.borderColor="red"};
-//     // bluebird.style.borderColor="red";gameContainer.style.backgroundColor = "pink";
-//     // if (oldFood != undefined && parseInt(oldFood.style.left)==0) 
-
-//     let randomNumber = Math.random();
-//     let food = document.createElement("span");
-//     food.style.left = "100%";
-//     food.style.bottom = "70%";
-//     food.classList.add("moveLeft");
-//     if (randomNumber > 0.5) {
-//         food.classList.add("fas");
-//         food.classList.add("fa-candy-cane");
-//     }
-//     else {
-//         food.classList.add("fas");
-//         food.classList.add("fa-poo");
-//     };
-//     gameContainer.appendChild(food);
-// }
 
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function createFood2() {
+function createDino() {
+    if (!paused) {
+        let foodPosition = 100;
+        let food = document.createElement("span");
+        food.classList.add("food");
+        //behövs detta? position abrolut
+        food.style.left = foodPosition + moveDistance + "%";
+        var sound = document.getElementById("myAudio");
+        var loops = 1;
+        var count = 0;
+        sound.play();
+        sound.onended = function () {
+            if (count < loops) {
+                count++;
+                this.play();
+            }
+        }
+        food.style.bottom = "10vh";
+        food.classList.add("dino");
+        let dinoJump = setInterval(function () {
+            jump(food, 100)
+        }, 5000);
+        // behöver jag clearinterval?
+        gameContainer.appendChild(food);
+        //flyttar maten, bryt ut, hämta array
+        //är det här dumt för att varje mat har sitt eget intervall?
+        // försvinner det när elementet försvinner?
+        let moveFood = setInterval(() => {
+            if (!paused) {
+                moveDistance = 1;
+                foodPosition = parseInt(food.style.left);
+                food.style.left = foodPosition - moveDistance + "%";
+            }
+        }, 100)
+    }
+}
 
-    let moveDistance = 1;
-    let randomNumber = Math.random();
-    let foodPosition = 100;
-    let food = document.createElement("span");
-    food.style.left = foodPosition + moveDistance + "%";
-    food.style.bottom = randomIntFromInterval(20, 80) + "%";
-    food.classList.add("fas");
-    if (randomNumber > 0.3) {
-        food.classList.add("fa-candy-cane");
-    } else {
-        food.classList.add("fa-poo");
-    };
-    gameContainer.appendChild(food);
-    //flyttar maten, bryt ut, hämta array
-    let moveFood = setInterval(() => {
-        moveDistance = 0.1;
-        foodPosition = parseInt(food.style.left);
-        food.style.left = foodPosition - moveDistance + "%";
-        let oldFood = document.querySelectorAll("span");
+function createFood() {
+    if (!paused) {
+        // let moveDistance = 1;
+        let randomNumber = Math.random();
+        let foodPosition = 100;
+        //de skapas 100% till höger på skärmen
+        let food = document.createElement("span");
+        food.classList.add("food");
+        food.style.left = foodPosition + "%";
+        food.style.bottom = randomIntFromInterval(30, 80) + "%";
+        // food.classList.add("fas");
+        if (randomNumber > 0.5) {
+            food.textContent = "🥝"
+            // food.classList.add("fa-candy-cane");
+        }
+        //else if (randomNumber < 0.2) {
+
+
+        //     var sound = document.getElementById("myAudio");
+        //     var loops = 1;
+        //     var count = 0;
+        //     sound.play();
+        //     sound.onended = function () {
+        //         if (count < loops) {
+        //             count++;
+        //             this.play();
+        //         }
+        //     }
+
+
+        //     food.style.bottom = "10vh";
+        //     food.classList.add("dino");
+
+        //     let dinoJump = setInterval(function () {
+        //         jump(food)
+        //     }, 8000);
+        //     // behöver jag clearinterval?
+        // }
+        else {
+            // food.classList.add("fa-poo");
+            food.textContent = "💩"
+            food.classList.add("zigzag");
+        };
+        gameContainer.appendChild(food);
+        //flyttar maten, bryt ut, hämta array
+        //är det här dumt för att varje mat har sitt eget intervall?
+        // försvinner det när elementet försvinner?
+        let moveFood = setInterval(() => {
+            if (!paused) {
+                moveDistance = 0.1;
+                foodPosition = parseInt(food.style.left);
+                food.style.left = foodPosition - moveDistance + "%";
+            }
+        }, 300)
+    }
+}
+
+
+
+function removeFood() {
+    setInterval(() => {
+        let oldFood = document.querySelectorAll(".food");
         if (oldFood[0]) {
             let position = window.getComputedStyle(oldFood[0]).getPropertyValue("left");
-            if (parseInt(position) < 0) {
+            if (parseInt(position) <= 0) {
                 console.log(position);
                 gameContainer.removeChild(oldFood[0])
-                // clearInterval(moveFood);
             }
         }
     }, 300)
 }
 
+
 function collision() {
-    let detection = setInterval(() => {
+    if (!paused) {
+        let detection = setInterval(() => {
             let birdWidth = parseInt(window.getComputedStyle(bluebird).getPropertyValue("width"));
             let birdHeight = parseInt(window.getComputedStyle(bluebird).getPropertyValue("height"));
-            let oldFood = document.querySelectorAll("span");
-            if (oldFood.length>0) { //det blir fel om funktionen körs innan det finns någon mat
+            let oldFood = document.querySelectorAll("span.food");
+            if (oldFood.length > 0) { //det blir fel om funktionen körs innan det finns någon mat
                 for (let index = 0; index < oldFood.length; index++) {
                     let foodPositionLeft = parseInt(window.getComputedStyle(oldFood[index]).getPropertyValue("left"));
                     let foodPositionBottom = parseInt(window.getComputedStyle(oldFood[index]).getPropertyValue("bottom"));
                     let birdPositionLeft = parseInt(window.getComputedStyle(bluebird).getPropertyValue("left"));
                     let birdPositionBottom = parseInt(window.getComputedStyle(bluebird).getPropertyValue("bottom"));
-                    console.log("mat: ", foodPositionLeft, foodPositionBottom, "fågel: ", birdPositionLeft, birdPositionBottom)
-                    if (foodPositionLeft > birdPositionLeft - 100 && foodPositionLeft < birdPositionLeft +100  && foodPositionBottom > birdPositionBottom - 100 && foodPositionBottom < birdPositionBottom +100)
-                    {var sound = document.getElementById("myAudio");
-                    sound.play();
-                    gameContainer.removeChild(oldFood[index])};
+                    // console.log("mat: ", foodPositionLeft, foodPositionBottom, "fågel: ", birdPositionLeft, birdPositionBottom)
+                    if (foodPositionLeft > birdPositionLeft - birdWidth && foodPositionLeft < birdPositionLeft + 100 && foodPositionBottom > birdPositionBottom - 300 && foodPositionBottom < birdPositionBottom + 100) {
+                        handleCollision(oldFood[index])
+                    };
                     //  && foodPositionBottom == birdPositionBottom 
                 }
             }
         }, 50)
+    }
 }
 
+
+function handleCollision(collidingObject) {
+    if (collidingObject.classList.contains("zigzag")) {
+        console.log("poop")
+        score -= 1;
+        gameContainer.removeChild(collidingObject);
+        scoreDisplay.textContent = score;
+    } else if (collidingObject.classList.contains("dino")) {
+        console.log("dino")
+        lives -= 1;
+        gameContainer.removeChild(bluebird);
+        livesDisplay.textContent = lives;
+    } else {
+        console.log("kiwi")
+        score += 1;
+        gameContainer.removeChild(collidingObject);
+        scoreDisplay.textContent = score;
+        if (score >= 20) {
+            alert("du vann!")
+        }
+    }
+}
 
 //hämta position för all mat
 //loopa igenom och jämför med position för fågeln
 //om samma kolla klassnamn
 //om polkagris +1
-//om bajs clearinterval
+//om dino clearinterval
 
 
+switches.addEventListener("change", (e) => {
+    switch (e.target.id) {
+        case "pauseButton":
+            if (!e.target.checked) {
+                paused = true;
+                document.querySelector(".pause").textContent = "pause"
+                break;
+            } else {
+                paused = false;
+                document.querySelector(".pause").textContent = "play";
+                break;
+            }
+            case "musicButton":
+                const audio = document.getElementById("myAudio");
+                if (e.target.checked) {
+                    audio.muted = false;
+                    document.querySelector(".sound").textContent = "on";
+                    break;
+                } else {
+                    audio.muted = true;
+                    document.querySelector(".sound").textContent = "off";
+                    break;
+                }
+
+    }
+})
 
 
-const stopButton = document.querySelector("#stopButton");
-stopButton.addEventListener("click", ()=>{alert("tryck ok för att starta igen"); clearInterval(
-    createFood2)})
+let makeFood;
+let makeDino
 
 function makeFlyingFood() {
-    setInterval(
-        createFood2, 5000)
+    makeFood = setInterval(
+        createFood, 5000)
+    makeDino= setInterval(
+        createDino, 60000)
+
 }
+
 
 makeFlyingFood()
 collision()
+removeFood()
