@@ -10,16 +10,31 @@ let paused = false;
 let lives = 3;
 let score = 0;
 
-//bugg: kiwin backar efter hopp om ansiktet åt vänster
-//bryt ut dino
-//räknare liv och kiwis
+//intervall
+let dinoJump;
+let detection;
+
+//körs vid sidladdning
+
+function startGame() {
+    scoreDisplay.textContent = score;
+    livesDisplay.textContent = lives;
+    document.addEventListener("keydown", (evt) => moveBird(evt));
+}
 
 scoreDisplay.textContent = score;
 livesDisplay.textContent = lives;
+document.addEventListener("keydown", (evt) => moveBird(evt));
+alert("Play using arrows and J on keyboard")
 
+
+//hoppa
 function jump(element, jumptime) {
-    if(element.classList.contains("dino"))
-    {element.classList.add("dinoJump")};
+    if (element.classList.contains("dino")) {
+        setTimeout(function () {
+            element.classList.add("dinoJump");
+        }, 300);
+    };
     let counter = 0;
     let bottom = 0;
     let timer = setInterval(() => {
@@ -41,8 +56,9 @@ function jump(element, jumptime) {
     }, jumptime);
 }
 
-//funktionen som flyttar fågeln
-document.addEventListener("keydown", function (evt) {
+
+//flytta fågeln
+function moveBird(evt) {
     let moveDistance = 1;
     let birdPosition = parseInt(bluebird.style.left);
 
@@ -64,36 +80,39 @@ document.addEventListener("keydown", function (evt) {
             }
             break;
         case "j":
+        case "J":
+        case "ArrowUp":
             jump(bluebird, 70);
             break;
     }
-});
+};
 
-
+//slumpa en siffra
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+//skapa fiende
 function createDino() {
     if (!paused) {
         let foodPosition = 100;
         let food = document.createElement("span");
         food.classList.add("food");
-        //behövs detta? position abrolut
         food.style.left = foodPosition + moveDistance + "%";
         var sound = document.getElementById("myAudio");
         var loops = 1;
         var count = 0;
         sound.play();
-        sound.onended = function () {
-            if (count < loops) {
-                count++;
-                this.play();
-            }
-        }
+        // sound.onended = function () {
+        //     if (count < loops) {
+        //         count++;
+        //         this.play();
+        //     }
+        // }
         food.style.bottom = "10vh";
         food.classList.add("dino");
-        let dinoJump = setInterval(function () {
+        dinoJump = setInterval(function () {
+            console.log("hopp")
             jump(food, 100)
         }, 5000);
         // behöver jag clearinterval?
@@ -173,22 +192,42 @@ function createFood() {
 function removeFood() {
     setInterval(() => {
         let oldFood = document.querySelectorAll(".food");
-        if (oldFood[0]) {
-            let position = window.getComputedStyle(oldFood[0]).getPropertyValue("left");
+        for (let index = 0; index < oldFood.length; index++) {
+            const food = oldFood[index];
+            let position = window.getComputedStyle(food).getPropertyValue("left");
             if (parseInt(position) <= 0) {
                 console.log(position);
-                gameContainer.removeChild(oldFood[0])
+                if (food.classList.contains("dino")) {
+                    console.log("dino ute");
+                    clearInterval(dinoJump);
+                    setTimeout(function() {
+                    gameContainer.removeChild(food);
+                }, 2000);
+                //node is not a child?
+                }
+                else {gameContainer.removeChild(food);} 
             }
         }
+
+        // if (oldFood[0]) {
+        //     let position = window.getComputedStyle(oldFood[0]).getPropertyValue("left");
+        //     if (parseInt(position) <= 0) {
+        //         console.log(position);
+        //         if(parseInt(position) <= 0 && oldFood[0].classList.contains("dino"))
+        //         {console.log("dino ute"); clearInterval(dinoJump)}
+        //         gameContainer.removeChild(oldFood[0]);
+        //     }
+        // }
     }, 300)
 }
 
 
+
 function collision() {
     if (!paused) {
-        let detection = setInterval(() => {
-            let birdWidth = parseInt(window.getComputedStyle(bluebird).getPropertyValue("width"));
-            let birdHeight = parseInt(window.getComputedStyle(bluebird).getPropertyValue("height"));
+        detection = setInterval(() => {
+            // let birdWidth = parseInt(window.getComputedStyle(bluebird).getPropertyValue("width"));
+            // let birdHeight = parseInt(window.getComputedStyle(bluebird).getPropertyValue("height"));
             let oldFood = document.querySelectorAll("span.food");
             if (oldFood.length > 0) { //det blir fel om funktionen körs innan det finns någon mat
                 for (let index = 0; index < oldFood.length; index++) {
@@ -197,7 +236,7 @@ function collision() {
                     let birdPositionLeft = parseInt(window.getComputedStyle(bluebird).getPropertyValue("left"));
                     let birdPositionBottom = parseInt(window.getComputedStyle(bluebird).getPropertyValue("bottom"));
                     // console.log("mat: ", foodPositionLeft, foodPositionBottom, "fågel: ", birdPositionLeft, birdPositionBottom)
-                    if (foodPositionLeft > birdPositionLeft - birdWidth && foodPositionLeft < birdPositionLeft + 100 && foodPositionBottom > birdPositionBottom - 300 && foodPositionBottom < birdPositionBottom + 100) {
+                    if (foodPositionLeft > birdPositionLeft - 50 && foodPositionLeft < birdPositionLeft + 50 && foodPositionBottom > birdPositionBottom - 50 && foodPositionBottom < birdPositionBottom + 50) {
                         handleCollision(oldFood[index])
                     };
                     //  && foodPositionBottom == birdPositionBottom 
@@ -210,22 +249,35 @@ function collision() {
 
 function handleCollision(collidingObject) {
     if (collidingObject.classList.contains("zigzag")) {
-        console.log("poop")
         score -= 1;
         gameContainer.removeChild(collidingObject);
         scoreDisplay.textContent = score;
     } else if (collidingObject.classList.contains("dino")) {
         console.log("dino")
         lives -= 1;
-        gameContainer.removeChild(bluebird);
         livesDisplay.textContent = lives;
+        bluebird.classList.add("dead");
+        if (lives === 0) {
+            livesDisplay.textContent = lives;
+            alert("game over")
+        } else {
+            clearInterval(detection);
+            document.removeEventListener("keydown", (evt) => moveBird(evt))
+            setTimeout(function () {
+                bluebird.classList.remove("dead");
+                collision();
+                document.addEventListener("keydown", (evt) => moveBird(evt));
+            }, 5000);
+        }
     } else {
         console.log("kiwi")
         score += 1;
         gameContainer.removeChild(collidingObject);
         scoreDisplay.textContent = score;
-        if (score >= 20) {
+        if (score >= 12) {
             alert("du vann!")
+            clearInterval(makeDino);
+            clearInterval(makeFood);
         }
     }
 }
@@ -271,9 +323,8 @@ let makeDino
 function makeFlyingFood() {
     makeFood = setInterval(
         createFood, 5000)
-    makeDino= setInterval(
-        createDino, 60000)
-
+    makeDino = setInterval(
+        createDino, 20000)
 }
 
 

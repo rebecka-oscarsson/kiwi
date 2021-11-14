@@ -1,7 +1,7 @@
-* {
-    /* outline: 1px solid black; */
+/* {
+    
     box-sizing: border-box;
-}
+} */
 
 .dino {
     height: 35vh;
@@ -19,7 +19,7 @@
     width: 42vh;
     max-height: 839px;
     background-position-y: -846%;
-    /* procent av bakgrundens totala höjd */
+    /* procent av bakgrundens totala höjd  */
     animation: none;
 }
 
@@ -104,6 +104,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: max-content;
+    text-align: center;
+    column-gap: 1em;
 }
 
 .sound,
@@ -113,7 +115,7 @@
 
 .foreground {
     position: absolute;
-    left: 50vw;
+    left: 70vw;
     bottom: -2vh;
     height: 80vh;
     z-index: 1;
@@ -121,8 +123,8 @@
 
 .foreground2 {
     position: absolute;
-    right: 10vw;
-    bottom: 6vh;
+    left: 20vw;
+    bottom: 4vh;
     height: 60vh;
     z-index: 1;
 }
@@ -132,7 +134,7 @@
     height: 100%;
     background-image: url("palmmossa.png"), url("rosmossa.png");
     background-repeat: no-repeat;
-    background-position: left 25vw bottom 8vh, left 3vw bottom 12vh;
+    background-position: left 40vw bottom 8vh, left 3vw bottom 11.5vh;
     background-size: auto 70vh, auto 30vh;
     z-index: 1;
 }
@@ -179,6 +181,12 @@ span.food {
 .mirror {
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
+}
+
+.dead {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    transition: .2s;
 }
 
 /* .jump {
@@ -233,7 +241,7 @@ w3shools sliders
     display: inline-block;
     width: 60px;
     height: 34px;
-    margin: 0.5em;
+    margin: 0.5em auto 0.5em auto;
 }
 
 .switch input {
