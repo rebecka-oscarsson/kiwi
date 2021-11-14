@@ -266,7 +266,7 @@ function handleCollision(collidingObject) {
             setTimeout(function () {
                 bluebird.classList.remove("dead");
                 collision();
-                document.addEventListener("keydown", (evt) => moveBird(evt));
+                // document.addEventListener("keydown", (evt) => moveBird(evt));
             }, 5000);
         }
     } else {
