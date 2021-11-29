@@ -4,14 +4,16 @@
 } */
 
 .dino {
-    height: 35vh;
+    height: 35.05vh;
     width: 42vh;
     max-height: 1150px;
     max-width: 1380px;
-    background: url('dinoSprite.png');
+    background: url('dinoSprite3.png');
     background-size: 100% auto;
     animation: walk 1s infinite, jump 0.3s alternate infinite ease-in-out;
     cursor: help;
+    /* margin:0;
+    padding:0; */
 }
 
 .dinoJump {
@@ -23,15 +25,177 @@
     animation: none;
 }
 
+.croc {
+    height: 16.4vh;
+    width: 42vh;
+    max-height: 300px;
+    max-width: 769px;
+    background: url('croc.png');
+    background-size: 100% auto;
+    animation: chew 1s infinite, jump 0.3s alternate infinite ease-in-out;
+    cursor: help;
+    /* margin:0;
+    padding:0; */
+}
+
 .fa-kiwi-bird {
     color: teal;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black;
 }
 
+.gameInfo {
+    display: grid;
+    grid-template-columns: max-content;
+    grid-template-rows: auto auto auto;
+    justify-content: flex-start;
+    padding: 2em;
+    border-radius: 0 0 30% 0;
+    justify-self: flex-start;
+}
+
+.instructions {
+    grid-area: 2/1/3/2;
+}
+
+.score {
+    grid-area: 3/1/4/2;
+    font-size: xx-large;
+}
+
+.switches {
+    width: 100%;
+    grid-area: 1/1/2/3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: max-content;
+    text-align: center;
+    column-gap: 1em;
+}
+
+.sound,
+.pause {
+    text-transform: uppercase;
+}
+
+.foreground {
+    position: absolute;
+    left: 70vw;
+    bottom: -2vh;
+    height: 80vh;
+    z-index: 1;
+}
+
+.foreground2 {
+    position: absolute;
+    left: 20vw;
+    bottom: 4vh;
+    height: 60vh;
+    z-index: 1;
+}
+
+#gameContainer {
+    width: 100%;
+    height: 100%;
+    
+    z-index: 1;
+}
+
+html {background: linear-gradient(to bottom, gray, rgb(235, 186, 96), 88vh, olive 12vh);}
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-image: url("palmmossa.png"), url("rosmossa.png");
+    background-repeat: no-repeat;
+    background-position: left 40vw bottom 8vh, left 3vw bottom 11.5vh;
+    background-size: auto 70vh, auto 30vh;
+    
+    /* min-height: 100vh; */
+    height: 100vh;
+    /* width: 100vw; */
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-items: flex-end;
+}
+
+
+
+span.food {
+    position: absolute;
+    font-size: 50px;
+    /* -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+    color: darkgoldenrod; */
+    z-index: 0;
+}
+
+
+
+.kiwiBird {
+    font-size: 50px;
+    position: absolute;
+    bottom: 10vh;
+    /* height: 35vh; */
+}
+
+
+.mirror {
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.dead {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    transition: .2s;
+}
+
+/* .jump {
+    animation: jump 0.2s alternate infinite ease-in-out, moveRight 10s 1 linear forwards;
+} */
+
+/* .gameContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+} */
+
+.jump {
+    animation: jump 0.2s alternate infinite ease-in-out
+}
+
+/* ---------------------------
+animations
+--------------------------- */
+
 @keyframes jump {
     to {
-        transform: translatey(-20px);
+        transform: translatey(-10px);
+    }
+}
+
+.zigzag {
+    animation: zigzag 15s alternate infinite ease-in-out;
+}
+
+@keyframes zigzag {
+    25% {
+        transform: translatey(-5vh);
+    }
+
+    50% {
+        transform: translatey(+10vh);
+    }
+
+    75% {
+        transform: translatey(-10vh);
+    }
+
+    100% {
+        transform: translatey(+5vh);
     }
 }
 
@@ -81,154 +245,49 @@
     }
 }
 
-.gameInfo {
-    display: grid;
-    grid-template-columns: max-content;
-    grid-template-rows: auto auto auto;
-    justify-content: flex-start;
-    margin: 2em;
-}
-
-.instructions {
-    grid-area: 1/1/2/2;
-}
-
-.score {
-    grid-area: 3/1/4/2;
-    font-size: xx-large;
-}
-
-.switches {
-    width: 100%;
-    grid-area: 2/1/3/3;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: max-content;
-    text-align: center;
-    column-gap: 1em;
-}
-
-.sound,
-.pause {
-    font-weight: bold;
-}
-
-.foreground {
-    position: absolute;
-    left: 70vw;
-    bottom: -2vh;
-    height: 80vh;
-    z-index: 1;
-}
-
-.foreground2 {
-    position: absolute;
-    left: 20vw;
-    bottom: 4vh;
-    height: 60vh;
-    z-index: 1;
-}
-
-#gameContainer {
-    width: 100%;
-    height: 100%;
-    background-image: url("palmmossa.png"), url("rosmossa.png");
-    background-repeat: no-repeat;
-    background-position: left 40vw bottom 8vh, left 3vw bottom 11.5vh;
-    background-size: auto 70vh, auto 30vh;
-    z-index: 1;
-}
-
-body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Courier New', Courier, monospace;
-    background: linear-gradient(to bottom, gray, rgb(235, 186, 96), 88vh, olive 12vh);
-    /* min-height: 100vh; */
-    height: 100vh;
-    /* width: 100vw; */
-    overflow: hidden;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    align-items: flex-end;
-}
-
-footer {
-    height: 100%;
-    background-color: lightblue;
-    z-index: 0;
-}
-
-span.food {
-    position: absolute;
-    font-size: 50px;
-    /* -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black;
-    color: darkgoldenrod; */
-    z-index: 0;
-}
-
-
-
-.bluebird {
-    font-size: 50px;
-    position: absolute;
-    bottom: 10vh;
-    /* height: 35vh; */
-}
-
-
-.mirror {
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
-}
-
-.dead {
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
-    transition: .2s;
-}
-
-/* .jump {
-    animation: jump 0.2s alternate infinite ease-in-out, moveRight 10s 1 linear forwards;
-} */
-
-/* .gameContainer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-} */
-
-.jump {
-    animation: jump 0.2s alternate infinite ease-in-out
-}
-
-
-@keyframes jump {
-    to {
-        transform: translatey(-20px);
-    }
-}
-
-.zigzag {
-    animation: zigzag 15s alternate infinite ease-in-out;
-}
-
-@keyframes zigzag {
-    25% {
-        transform: translatey(-5vh);
+@keyframes chew {
+    0% {
+        background-position-y: 0%
     }
 
-    50% {
-        transform: translatey(+10vh);
+    19.999% {
+        background-position-y: 0%
     }
 
-    75% {
-        transform: translatey(-10vh);
+    20% {
+        background-position-y: -100%
     }
+
+    39.999% {
+        background-position-y: -100%
+    }
+
+    40% {
+        background-position-y: -200%
+    }
+
+    59.999% {
+        background-position-y: -200%
+    }
+
+    60% {
+        background-position-y: -100%
+    }
+
+    79.999% {
+        background-position-y: -100%
+    }
+
+    80% {
+        background-position-y: 0
+    }
+
+    /* 99.999% {
+        background-position-y: -200%
+    } */
 
     100% {
-        transform: translatey(+5vh);
+        background-position-y: 0;
     }
 }
 
@@ -257,7 +316,7 @@ w3shools sliders
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: peru;
+    background-color: transparent;
     -webkit-transition: .4s;
     transition: .4s;
     border-radius: 34px;
@@ -281,11 +340,11 @@ w3shools sliders
 }
 
 input:checked+.slider {
-    background-color: olivedrab;
+    background-color: rgba(107, 142, 35, 0.7);
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px olivedrab;
+    box-shadow: 0 0 1px rgba(107, 142, 35, 0.7);
 }
 
 input:checked+.slider:before {
