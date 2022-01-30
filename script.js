@@ -12,11 +12,16 @@ const winSound = document.getElementById("win");
 const gameOverSound = document.getElementById("gameOver");
 
 //variabler
+let moveInterval = 100 //tid i millisekunder mellan att mat/fiende hoppar ett steg
 let paused = false;
 let croc = false; //avgör om det blir krokodil eller dinosaurie
 let lives = 3;
 let score = 0;
 let jumping = false;
+let muteSound = false;
+const gameOver = `<h2>Game Over</h2>`
+const victory = `<h2>You win!</h2>`
+const start = `<h2>Kiwi</h2> <p>Use arrow keys and/or letter J <br>to collect the kiwis.</p>`
 
 //intervall
 let dinoJump; //får dinosaurien att hoppa
@@ -26,43 +31,59 @@ let createFood; //gör bajs och kiwifrukt
 let createEnemies;
 let moveFood; //flyttar bajs och kiwifrukt
 
+showDialog(start);
 
 function startGame() {
+  paused = false;
+  //de här borde kunna vara parametrar, så även speed
+  lives = 3;
+  score = 0;
   scoreDisplay.textContent = score;
   livesDisplay.textContent = lives;
+  kiwiBird.classList.remove("dead");
+  removeElements();
   document.addEventListener("keydown", moveBird);
   createFood = setInterval(createFoodItem, 5000);
   createEnemies = setInterval(createEnemy, 20000);
   clearItems = setInterval(clearItem, 300);
-  collisionDetection = setInterval(checkCollision, 50)
+  collisionDetection = setInterval(checkCollision, 50);
 }
 
 function stopGame() {
-  removeElements();
+  removeAnimations();
   document.removeEventListener("keydown", moveBird);
   clearInterval(createFood);
   clearInterval(createEnemies);
   clearInterval(clearItems);
   clearInterval(collisionDetection);
+  // clearInterval(dinoJump);
   // clearInterval(moveFood);
   paused = true;
 }
 
-function removeElements()
-{const foodElements = document.querySelectorAll(".food");
-for (let index = 0; index < foodElements.length; index++) {
-  gameContainer.removeChild(foodElements[index]); 
-}}
+//tar bort css-animationer
+function removeAnimations() {
+  const foodElements = document.querySelectorAll(".food");
+  for (let index = 0; index < foodElements.length; index++) {
+    foodElements[index].classList.remove("zigzag");
+    foodElements[index].classList.remove("dinoJump");
+  }
+}
 
-
-startGame();
+//tar bort alla fiender och mat
+function removeElements() {
+  const foodElements = document.querySelectorAll(".food");
+  for (let index = 0; index < foodElements.length; index++) {
+    gameContainer.removeChild(foodElements[index]);
+  }
+}
 
 //hoppa
 function jump(element, jumptime) {
   if (element.classList.contains("dino")) {
     setTimeout(function () {
       element.classList.add("dinoJump"); //det här ger dinosaurien annorlunda utseende när den hoppar
-    }, 300);
+    }, moveInterval*3);
   }
   let counter = 0;
   let bottom = 0;
@@ -82,10 +103,8 @@ function jump(element, jumptime) {
       }, jumptime);
     }
     element.style.bottom = bottom + "%";
-  }, jumptime)
+  }, jumptime);
 }
-
-
 
 //flytta fågeln
 function moveBird(evt) {
@@ -130,18 +149,19 @@ function createEnemy() {
     let foodPosition = 100;
     let food = document.createElement("span");
     food.classList.add("food");
-    food.style.left = foodPosition + moveDistance + "%";
-    enemySound.play();
+    food.style.left = foodPosition +"%";
+    if(!muteSound)
+    {enemySound.play();}
     food.style.bottom = "10vh";
     if (croc) {
       food.classList.add("croc");
       croc = false;
     } else {
       food.classList.add("dino");
-      dinoJump = setInterval(function () {
-        console.log("hopp");
-        jump(food, 100);
-      }, 5000);
+      dinoJump = setTimeout(function () {
+        console.log("dinohopp");
+        jump(food, 90);
+      }, moveInterval*40);
       croc = true;
     }
     // behöver jag clearinterval?
@@ -151,11 +171,11 @@ function createEnemy() {
     // försvinner det när elementet försvinner?
     setInterval(() => {
       if (!paused) {
-        moveDistance = 1;
+        let moveDistance = 1;
         foodPosition = parseInt(food.style.left);
         food.style.left = foodPosition - moveDistance + "%";
       }
-    }, 100);
+    }, moveInterval);
   }
 }
 
@@ -171,8 +191,7 @@ function createFoodItem() {
     food.style.bottom = randomIntFromInterval(30, 80) + "%";
     if (randomNumber > 0.5) {
       food.textContent = "🥝";
-    }
-    else {
+    } else {
       food.textContent = "💩";
       food.classList.add("zigzag");
     }
@@ -182,12 +201,12 @@ function createFoodItem() {
     // försvinner det när elementet försvinner?
     moveFood = setInterval(() => {
       if (!paused) {
-        console.log("flytt")
-        moveDistance = 0.1;
+        console.log("flytt");
+        let moveDistance = 0.1;
         foodPosition = parseInt(food.style.left);
         food.style.left = foodPosition - moveDistance + "%";
       }
-    }, 300);
+    }, moveInterval * 3);
   }
 }
 
@@ -198,14 +217,16 @@ function clearItem() {
     let position = window.getComputedStyle(food).getPropertyValue("left");
     if (parseInt(position) <= 0) {
       if (food.classList.contains("dino") || food.classList.contains("croc")) {
-        let foodWidth = parseInt(window.getComputedStyle(food).getPropertyValue("width"));
+        let foodWidth = parseInt(
+          window.getComputedStyle(food).getPropertyValue("width")
+        );
         if (parseInt(position) <= 0 - foodWidth) {
-          clearInterval(dinoJump);
+          // clearInterval(dinoJump);
           gameContainer.removeChild(food);
         }
       } else {
-        gameContainer.removeChild(food)
-      };
+        gameContainer.removeChild(food);
+      }
     }
   }
 }
@@ -247,71 +268,118 @@ function checkCollision() {
 
 function handleCollision(collidingObject) {
   if (collidingObject.classList.contains("zigzag")) {
-    poopSound.play();
-    kiwiBird.style.color="sienna";
+    if(!muteSound)
+    {poopSound.play();}
+    kiwiBird.style.color = "sienna";
     score -= 1;
     gameContainer.removeChild(collidingObject);
     scoreDisplay.textContent = score;
-  } else if (collidingObject.classList.contains("dino") || collidingObject.classList.contains("croc")) {
+  } else if (
+    collidingObject.classList.contains("dino") ||
+    collidingObject.classList.contains("croc")
+  ) {
     lives -= 1;
     livesDisplay.textContent = lives;
     kiwiBird.classList.add("dead");
     if (lives === 0) {
-      gameOverSound.play();
-      confirm("Game Over 🙁 Play again?");
+      if(!muteSound)
+      {gameOverSound.play();}
       stopGame();
+      showDialog(gameOver);
     } else {
-      deadSound.play();
+      if(!muteSound)
+      {deadSound.play();}
       clearInterval(collisionDetection);
       document.removeEventListener("keydown", moveBird);
       setTimeout(function () {
         kiwiBird.classList.remove("dead");
-        collisionDetection = setInterval(checkCollision, 50)
+        collisionDetection = setInterval(checkCollision, 50);
         document.addEventListener("keydown", moveBird);
       }, 2500);
     }
   } else {
-    kiwiBird.style.color="teal";
-    kiwiSound.play();
+    kiwiBird.style.color = "teal";
+    if(!muteSound)
+    {kiwiSound.play();}
     score += 1;
     gameContainer.removeChild(collidingObject);
     scoreDisplay.textContent = score;
-    if (score >= 3) {
-      winSound.play();
-      alert("du vann!");
+    if (score === 5) {
+      moveInterval = 50;
+    }
+    if (score === 10) {
+      moveInterval = 25;
+    }
+    if (score === 15) {
+      if(!muteSound)
+      {winSound.play();}
+      showDialog(victory);
       stopGame();
     }
   }
 }
 
-//hämta position för all mat
-//loopa igenom och jämför med position för fågeln
-//om samma kolla klassnamn
-//om polkagris +1
-//om dino clearinterval
-
 switches.addEventListener("change", (e) => {
+  let soundText = document.querySelector(".sound");
+  let muteText = document.querySelector(".mute");
+  let playText = document.querySelector(".play");
+  let pauseText = document.querySelector(".pause")
   switch (e.target.id) {
     case "pauseButton":
       if (!e.target.checked) {
         paused = true;
-        document.querySelector(".pause").textContent = "pause";
+        pauseText.style.backgroundColor = "peru";
+        playText.style.backgroundColor = "transparent";
+        document.removeEventListener("keydown", moveBird)
         break;
       } else {
         paused = false;
-        document.querySelector(".pause").textContent = "play";
+        playText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
+        pauseText.style.backgroundColor = "transparent";
+        document.addEventListener("keydown", moveBird)
         break;
       }
-      case "musicButton":
-        const audio = document.getElementById("myAudio");
-        if (e.target.checked) {
-          audio.muted = false;
-          document.querySelector(".sound").style.textDecoration = "none";
-          break;
-        } else {
-          audio.muted = true;
-          document.querySelector(".sound").style.textDecoration = "line-through";
-          break;
-        }
+    case "musicButton":
+      if (e.target.checked) {
+        muteSound = false
+        soundText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
+        muteText.style.backgroundColor = "transparent";
+        break;
+      } else {
+        muteSound = true
+        muteText.style.backgroundColor = "peru";
+        soundText.style.backgroundColor = "transparent";
+        break;
+      }
   }
 });
+
+function showDialog(gameEvent) {
+  const dialog = document.createElement("dialog");
+  dialog.setAttribute("open", "");
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("tabindex", "0");
+
+  dialog.insertAdjacentHTML("beforeend", gameEvent);
+  document.body.appendChild(dialog);
+  let closeButton = document.createElement("button");
+  switch(gameEvent) {
+    case gameOver:
+      closeButton.innerText = "Play Again";
+      closeButton.addEventListener("click", startGame);
+      break;
+    case victory:
+      closeButton.innerText = "Yay!";
+      break;
+    default:
+      closeButton.innerText = "Start Game";
+      closeButton.addEventListener("click", startGame);
+  }
+  closeButton.addEventListener("click", closeDialog);
+  dialog.appendChild(closeButton);  
+}
+
+function closeDialog() {
+  let dialog = document.querySelector("dialog");
+  document.body.removeChild(dialog);
+}
