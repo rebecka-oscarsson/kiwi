@@ -12,16 +12,17 @@ const winSound = document.getElementById("win");
 const gameOverSound = document.getElementById("gameOver");
 
 //variabler
-let moveInterval = 100 //tid i millisekunder mellan att mat/fiende hoppar ett steg
+let moveInterval = 100; //tid i millisekunder mellan att mat/fiende hoppar ett steg
 let paused = false;
 let croc = false; //avgör om det blir krokodil eller dinosaurie
 let lives = 3;
 let score = 0;
 let jumping = false;
 let muteSound = false;
-const gameOver = `<h2>Game Over</h2>`
-const victory = `<h2>You win!</h2>`
-const start = `<h2>Kiwi</h2> <p>Use arrow keys and/or letter J <br>to collect the kiwis.</p>`
+const gameOver = `<h2>Game Over</h2>`;
+const victory = `<h2>You Win!</h2>`;
+const start = `<h2>Kiwi</h2> <p>Use arrow keys and/or letter J <br>to collect the kiwis.</p>`;
+const next = `<p>Go <a href="https://fjurp.000webhostapp.com/">watch tv<a/> or</p>`;
 
 //intervall
 let dinoJump; //får dinosaurien att hoppa
@@ -83,7 +84,7 @@ function jump(element, jumptime) {
   if (element.classList.contains("dino")) {
     setTimeout(function () {
       element.classList.add("dinoJump"); //det här ger dinosaurien annorlunda utseende när den hoppar
-    }, moveInterval*3);
+    }, moveInterval * 3);
   }
   let counter = 0;
   let bottom = 0;
@@ -149,9 +150,10 @@ function createEnemy() {
     let foodPosition = 100;
     let food = document.createElement("span");
     food.classList.add("food");
-    food.style.left = foodPosition +"%";
-    if(!muteSound)
-    {enemySound.play();}
+    food.style.left = foodPosition + "%";
+    if (!muteSound) {
+      enemySound.play();
+    }
     food.style.bottom = "10vh";
     if (croc) {
       food.classList.add("croc");
@@ -161,7 +163,7 @@ function createEnemy() {
       dinoJump = setTimeout(function () {
         console.log("dinohopp");
         jump(food, 90);
-      }, moveInterval*40);
+      }, moveInterval * 40);
       croc = true;
     }
     // behöver jag clearinterval?
@@ -268,8 +270,9 @@ function checkCollision() {
 
 function handleCollision(collidingObject) {
   if (collidingObject.classList.contains("zigzag")) {
-    if(!muteSound)
-    {poopSound.play();}
+    if (!muteSound) {
+      poopSound.play();
+    }
     kiwiBird.style.color = "sienna";
     score -= 1;
     gameContainer.removeChild(collidingObject);
@@ -282,13 +285,15 @@ function handleCollision(collidingObject) {
     livesDisplay.textContent = lives;
     kiwiBird.classList.add("dead");
     if (lives === 0) {
-      if(!muteSound)
-      {gameOverSound.play();}
+      if (!muteSound) {
+        gameOverSound.play();
+      }
       stopGame();
       showDialog(gameOver);
     } else {
-      if(!muteSound)
-      {deadSound.play();}
+      if (!muteSound) {
+        deadSound.play();
+      }
       clearInterval(collisionDetection);
       document.removeEventListener("keydown", moveBird);
       setTimeout(function () {
@@ -299,8 +304,9 @@ function handleCollision(collidingObject) {
     }
   } else {
     kiwiBird.style.color = "teal";
-    if(!muteSound)
-    {kiwiSound.play();}
+    if (!muteSound) {
+      kiwiSound.play();
+    }
     score += 1;
     gameContainer.removeChild(collidingObject);
     scoreDisplay.textContent = score;
@@ -311,8 +317,9 @@ function handleCollision(collidingObject) {
       moveInterval = 25;
     }
     if (score === 15) {
-      if(!muteSound)
-      {winSound.play();}
+      if (!muteSound) {
+        winSound.play();
+      }
       showDialog(victory);
       stopGame();
     }
@@ -323,30 +330,30 @@ switches.addEventListener("change", (e) => {
   let soundText = document.querySelector(".sound");
   let muteText = document.querySelector(".mute");
   let playText = document.querySelector(".play");
-  let pauseText = document.querySelector(".pause")
+  let pauseText = document.querySelector(".pause");
   switch (e.target.id) {
     case "pauseButton":
       if (!e.target.checked) {
         paused = true;
         pauseText.style.backgroundColor = "peru";
         playText.style.backgroundColor = "transparent";
-        document.removeEventListener("keydown", moveBird)
+        document.removeEventListener("keydown", moveBird);
         break;
       } else {
         paused = false;
         playText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
         pauseText.style.backgroundColor = "transparent";
-        document.addEventListener("keydown", moveBird)
+        document.addEventListener("keydown", moveBird);
         break;
       }
     case "musicButton":
       if (e.target.checked) {
-        muteSound = false
+        muteSound = false;
         soundText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
         muteText.style.backgroundColor = "transparent";
         break;
       } else {
-        muteSound = true
+        muteSound = true;
         muteText.style.backgroundColor = "peru";
         soundText.style.backgroundColor = "transparent";
         break;
@@ -363,20 +370,25 @@ function showDialog(gameEvent) {
   dialog.insertAdjacentHTML("beforeend", gameEvent);
   document.body.appendChild(dialog);
   let closeButton = document.createElement("button");
-  switch(gameEvent) {
+  switch (gameEvent) {
     case gameOver:
       closeButton.innerText = "Play Again";
       closeButton.addEventListener("click", startGame);
       break;
     case victory:
       closeButton.innerText = "Yay!";
+      closeButton.addEventListener("click", ()=>showDialog(next));
+      break;
+    case next:
+      closeButton.innerText = "Play again!";
+      closeButton.addEventListener("click", startGame);
       break;
     default:
       closeButton.innerText = "Start Game";
       closeButton.addEventListener("click", startGame);
   }
   closeButton.addEventListener("click", closeDialog);
-  dialog.appendChild(closeButton);  
+  dialog.appendChild(closeButton);
 }
 
 function closeDialog() {
