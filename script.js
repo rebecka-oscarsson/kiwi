@@ -13,6 +13,7 @@ const gameOverSound = document.getElementById("gameOver");
 
 //variabler
 let moveInterval = 100; //tid i millisekunder mellan att mat/fiende hoppar ett steg
+let enemyInterval = 15000; //tid i millisekunder mellan att det kommer en fiende
 let paused = false;
 let croc = false; //avgör om det blir krokodil eller dinosaurie
 let lives = 3;
@@ -22,7 +23,7 @@ let muteSound = false;
 const gameOver = `<h2>Game Over</h2>`;
 const victory = `<h2>You Win!</h2>`;
 const start = `<h2>Kiwi</h2> <p>Use arrow keys and/or letter J <br>to collect the kiwis.</p>`;
-const next = `<p>Go <a href="https://fjurp.000webhostapp.com/">watch tv<a/> or</p>`;
+const next = `<p>Go <a href="https://rebecka-oscarsson.github.io/tv-room/">watch tv<a/> or</p>`;
 
 //intervall
 let dinoJump; //får dinosaurien att hoppa
@@ -45,7 +46,7 @@ function startGame() {
   removeElements();
   document.addEventListener("keydown", moveBird);
   createFood = setInterval(createFoodItem, 5000);
-  createEnemies = setInterval(createEnemy, 20000);
+  createEnemies = setInterval(createEnemy, enemyInterval);
   clearItems = setInterval(clearItem, 300);
   collisionDetection = setInterval(checkCollision, 50);
 }
@@ -94,7 +95,7 @@ function jump(element, jumptime) {
     if (counter == 15) {
       clearInterval(timer);
       let timerDown = setInterval(() => {
-        if (bottom == 10) {
+        if (bottom <= 10) {
           clearInterval(timerDown);
           element.classList.remove("dinoJump");
         } else {
