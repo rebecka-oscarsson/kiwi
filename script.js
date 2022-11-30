@@ -10,6 +10,10 @@ const deadSound = document.getElementById("dead");
 const enemySound = document.getElementById("enemy");
 const winSound = document.getElementById("win");
 const gameOverSound = document.getElementById("gameOver");
+const gameOver = `<h2>Game Over</h2>`;
+const victory = `<h2>You Win!</h2><p>Go <a href="https://rebecka-oscarsson.github.io/tv-room/">watch tv<a/> or</p>`;
+const start = `<h2>Kiwi</h2> <p>Use arrow keys and space bar <br>Collect the kiwis</p>`;
+
 
 //variabler
 let moveInterval = 100; //tid i millisekunder mellan att mat/fiende hoppar ett steg
@@ -20,10 +24,6 @@ let lives = 3;
 let score = 0;
 let jumping = false;
 let muteSound = false;
-const gameOver = `<h2>Game Over</h2>`;
-const victory = `<h2>You Win!</h2>`;
-const start = `<h2>Kiwi</h2> <p>Use arrow keys and/or letter J <br>to collect the kiwis.</p>`;
-const next = `<p>Go <a href="https://rebecka-oscarsson.github.io/tv-room/">watch tv<a/> or</p>`;
 
 //intervall
 let dinoJump; //får dinosaurien att hoppa
@@ -35,11 +35,18 @@ let moveFood; //flyttar bajs och kiwifrukt
 
 showDialog(start);
 
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    paused = !paused;
+    applyPausedStyles(paused);
+  }
+});
+
 function startGame() {
   paused = false;
-  //de här borde kunna vara parametrar, så även speed
   lives = 3;
   score = 0;
+  moveInterval = 100;
   scoreDisplay.textContent = score;
   livesDisplay.textContent = lives;
   kiwiBird.classList.remove("dead");
@@ -127,13 +134,11 @@ function moveBird(evt) {
         break;
       }
       break;
-    case "j":
-    case "J":
     case "ArrowUp":
+    case " ":
       let birdBottom = parseInt(kiwiBird.style.bottom); //för att man inte ska kunna hoppa när man redan är i luften
       if (birdBottom === 10) {
         jump(kiwiBird, 70);
-        console.log(birdBottom);
       }
       break;
   }
@@ -204,7 +209,6 @@ function createFoodItem() {
     // försvinner det när elementet försvinner?
     moveFood = setInterval(() => {
       if (!paused) {
-        console.log("flytt");
         let moveDistance = 0.1;
         foodPosition = parseInt(food.style.left);
         food.style.left = foodPosition - moveDistance + "%";
@@ -330,24 +334,21 @@ function handleCollision(collidingObject) {
 switches.addEventListener("change", (e) => {
   let soundText = document.querySelector(".sound");
   let muteText = document.querySelector(".mute");
-  let playText = document.querySelector(".play");
-  let pauseText = document.querySelector(".pause");
+  const musicButton = document.getElementById("musicButton");
   switch (e.target.id) {
     case "pauseButton":
+      pauseButton.blur(); //för annars pausar man när man hoppar (med mellanslaget)
       if (!e.target.checked) {
         paused = true;
-        pauseText.style.backgroundColor = "peru";
-        playText.style.backgroundColor = "transparent";
-        document.removeEventListener("keydown", moveBird);
+        applyPausedStyles(true);
         break;
       } else {
         paused = false;
-        playText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
-        pauseText.style.backgroundColor = "transparent";
-        document.addEventListener("keydown", moveBird);
+        applyPausedStyles(false);
         break;
       }
     case "musicButton":
+      musicButton.blur();
       if (e.target.checked) {
         muteSound = false;
         soundText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
@@ -362,32 +363,33 @@ switches.addEventListener("change", (e) => {
   }
 });
 
+function applyPausedStyles(paused) {
+  const playText = document.querySelector(".play");
+  const pauseText = document.querySelector(".pause");
+  const pauseButton = document.getElementById("pauseButton");
+  if (paused) {
+    pauseText.style.backgroundColor = "peru";
+    playText.style.backgroundColor = "transparent";
+    document.removeEventListener("keydown", moveBird);
+  } else {
+    playText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
+    pauseText.style.backgroundColor = "transparent";
+    document.addEventListener("keydown", moveBird);
+  }
+  pauseButton.checked = !paused;
+}
+
 function showDialog(gameEvent) {
   const dialog = document.createElement("dialog");
   dialog.setAttribute("open", "");
   dialog.setAttribute("role", "dialog");
   dialog.setAttribute("tabindex", "0");
-
+  document.addEventListener("keydown", enableStartKey);
   dialog.insertAdjacentHTML("beforeend", gameEvent);
   document.body.appendChild(dialog);
   let closeButton = document.createElement("button");
-  switch (gameEvent) {
-    case gameOver:
-      closeButton.innerText = "Play Again";
-      closeButton.addEventListener("click", startGame);
-      break;
-    case victory:
-      closeButton.innerText = "Yay!";
-      closeButton.addEventListener("click", ()=>showDialog(next));
-      break;
-    case next:
-      closeButton.innerText = "Play again!";
-      closeButton.addEventListener("click", startGame);
-      break;
-    default:
-      closeButton.innerText = "Start Game";
-      closeButton.addEventListener("click", startGame);
-  }
+  gameEvent === start ? closeButton.innerText = "Start Game" : closeButton.innerText = "Play Again!";
+  closeButton.addEventListener("click", startGame);
   closeButton.addEventListener("click", closeDialog);
   dialog.appendChild(closeButton);
 }
@@ -395,4 +397,12 @@ function showDialog(gameEvent) {
 function closeDialog() {
   let dialog = document.querySelector("dialog");
   document.body.removeChild(dialog);
+  document.removeEventListener("keydown", enableStartKey);
+}
+
+function enableStartKey(e) {
+  if (e.key === "Enter") {
+    startGame();
+    closeDialog();
+  }
 }
