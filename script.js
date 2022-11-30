@@ -36,7 +36,7 @@ let moveFood; //flyttar bajs och kiwifrukt
 showDialog(start);
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
+  if (e.key === "Escape" || (e.key === "Enter" && paused)) {
     paused = !paused;
     applyPausedStyles(paused);
   }
