@@ -7,13 +7,11 @@ const livesDisplay = document.querySelector("#lives");
 const kiwiSound = document.getElementById("kiwi");
 const poopSound = document.getElementById("poop");
 const deadSound = document.getElementById("dead");
-const enemySound = document.getElementById("enemy");
 const winSound = document.getElementById("win");
 const gameOverSound = document.getElementById("gameOver");
 const gameOver = `<h2>Game Over</h2>`;
 const victory = `<h2>You Win!</h2><p>Go <a href="https://rebecka-oscarsson.github.io/tv-room/">watch tv<a/> or</p>`;
 const start = `<h2>Kiwi</h2> <p>Use arrow keys and space bar <br>Collect the kiwis</p>`;
-
 
 //variabler
 let moveInterval = 100; //tid i millisekunder mellan att mat/fiende hoppar ett steg
@@ -47,6 +45,7 @@ function startGame() {
   lives = 3;
   score = 0;
   moveInterval = 100;
+  enemyInterval = 15000;
   scoreDisplay.textContent = score;
   livesDisplay.textContent = lives;
   kiwiBird.classList.remove("dead");
@@ -157,9 +156,6 @@ function createEnemy() {
     let food = document.createElement("span");
     food.classList.add("food");
     food.style.left = foodPosition + "%";
-    if (!muteSound) {
-      enemySound.play();
-    }
     food.style.bottom = "10vh";
     if (croc) {
       food.classList.add("croc");
@@ -318,10 +314,12 @@ function handleCollision(collidingObject) {
     if (score === 5) {
       moveInterval = 50;
     }
-    if (score === 10) {
-      moveInterval = 25;
+    else if (score === 10) {
+      moveInterval = 75;
+      clearInterval(createEnemies);
+      createEnemies = setInterval(createEnemy, 4000);
     }
-    if (score === 15) {
+    else if (score === 15) {
       if (!muteSound) {
         winSound.play();
       }
@@ -332,33 +330,24 @@ function handleCollision(collidingObject) {
 }
 
 switches.addEventListener("change", (e) => {
-  let soundText = document.querySelector(".sound");
-  let muteText = document.querySelector(".mute");
+  const soundLabel = document.querySelector(".sound");
+  const muteLabel = document.querySelector(".mute");
   const musicButton = document.getElementById("musicButton");
   switch (e.target.id) {
     case "pauseButton":
       pauseButton.blur(); //för annars pausar man när man hoppar (med mellanslaget)
-      if (!e.target.checked) {
-        paused = true;
-        applyPausedStyles(true);
-        break;
-      } else {
-        paused = false;
-        applyPausedStyles(false);
-        break;
-      }
+      e.target.checked ? (paused = false) : (paused = true);
+      applyPausedStyles(paused);
     case "musicButton":
       musicButton.blur();
       if (e.target.checked) {
         muteSound = false;
-        soundText.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
-        muteText.style.backgroundColor = "transparent";
-        break;
+        soundLabel.style.backgroundColor = "rgba(107, 142, 35, 0.7)";
+        muteLabel.style.backgroundColor = "transparent";
       } else {
         muteSound = true;
-        muteText.style.backgroundColor = "peru";
-        soundText.style.backgroundColor = "transparent";
-        break;
+        muteLabel.style.backgroundColor = "peru";
+        soundLabel.style.backgroundColor = "transparent";
       }
   }
 });
@@ -388,7 +377,9 @@ function showDialog(gameEvent) {
   dialog.insertAdjacentHTML("beforeend", gameEvent);
   document.body.appendChild(dialog);
   let closeButton = document.createElement("button");
-  gameEvent === start ? closeButton.innerText = "Start Game" : closeButton.innerText = "Play Again!";
+  gameEvent === start
+    ? (closeButton.innerText = "Start Game")
+    : (closeButton.innerText = "Play Again!");
   closeButton.addEventListener("click", startGame);
   closeButton.addEventListener("click", closeDialog);
   dialog.appendChild(closeButton);
